@@ -274,7 +274,7 @@ class GameScene extends Phaser.Scene {
           otherPlayer.anims.play('walk-right', true);
         } else if (playerInfo.direction === 'up') {
           otherPlayer.anims.play('walk-up', true);
-        } else {
+        } else if(playerInfo.direction === 'down') {
           otherPlayer.anims.play('walk-down', true);
         }
       }
@@ -372,23 +372,23 @@ class GameScene extends Phaser.Scene {
     }
   
     // Update other players' positions and animations
-    Object.keys(this.players).forEach(playerId => {
-      const otherPlayer = this.players[playerId];
-      if (otherPlayer) {
-        // Update the animation for the other player based on direction
-        if (otherPlayer.direction === 'left') {
-          otherPlayer.anims.play('walk-left', true);
-        } else if (otherPlayer.direction === 'right') {
-          otherPlayer.anims.play('walk-right', true);
-        } else if (otherPlayer.direction === 'up') {
-          otherPlayer.anims.play('walk-up', true);
-        } else if (otherPlayer.direction === 'down') {
-          otherPlayer.anims.play('walk-down', true);
-        } else {
-          otherPlayer.anims.stop(); // Idle animation
-        }
-      }
-    });
+    // Object.keys(this.players).forEach(playerId => {
+    //   const otherPlayer = this.players[playerId];
+    //   if (otherPlayer) {
+    //     // Update the animation for the other player based on direction
+    //     if (otherPlayer.direction === 'left') {
+    //       otherPlayer.anims.play('walk-left', true);
+    //     } else if (otherPlayer.direction === 'right') {
+    //       otherPlayer.anims.play('walk-right', true);
+    //     } else if (otherPlayer.direction === 'up') {
+    //       otherPlayer.anims.play('walk-up', true);
+    //     } else if (otherPlayer.direction === 'down') {
+    //       otherPlayer.anims.play('walk-down', true);
+    //     } else {
+    //       otherPlayer.anims.stop(); // Idle animation
+    //     }
+    //   }
+    // });
   }
   
 
