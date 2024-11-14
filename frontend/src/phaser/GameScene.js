@@ -260,11 +260,23 @@ class GameScene extends Phaser.Scene {
       }
     });
 
-    // Handle player movement update
     this.socket.on('playerMoved', (playerInfo) => {
-      const player = this.players[playerInfo.playerId];
-      if (player) {
-        player.setPosition(playerInfo.x, playerInfo.y);
+      const otherPlayer = this.players[playerInfo.playerId];
+      if (otherPlayer) {
+        // Update position
+        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+    
+        // Update direction and animation
+        otherPlayer.direction = playerInfo.direction;
+        if (playerInfo.direction === 'left') {
+          otherPlayer.anims.play('walk-left', true);
+        } else if (playerInfo.direction === 'right') {
+          otherPlayer.anims.play('walk-right', true);
+        } else if (playerInfo.direction === 'up') {
+          otherPlayer.anims.play('walk-up', true);
+        } else {
+          otherPlayer.anims.play('walk-down', true);
+        }
       }
     });
 
@@ -319,45 +331,66 @@ class GameScene extends Phaser.Scene {
 
   update() {
     if (!this.player) return;
-
-    // Character movement logic
+  
+    // Local player movement logic
     let moved = false;
-    // console.log("hello world");
-    
-
+    let direction = '';
+  
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-100);
       this.player.anims.play('walk-left', true);
       moved = true;
+      direction = 'left';
     } else if (this.cursors.right.isDown) {
       this.player.setVelocityX(100);
       this.player.anims.play('walk-right', true);
       moved = true;
+      direction = 'right';
     } else if (this.cursors.up.isDown) {
       this.player.setVelocityY(-100);
       this.player.anims.play('walk-up', true);
       moved = true;
+      direction = 'up';
     } else if (this.cursors.down.isDown) {
       this.player.setVelocityY(100);
       this.player.anims.play('walk-down', true);
       moved = true;
+      direction = 'down';
     } else {
       this.player.setVelocity(0);
       this.player.anims.stop();
+      direction = 'idle'; // Default to idle if no movement
     }
-
-    if (moved) {
-      console.log("hello world");
-    }
-
-    // Emit player movement
+  
+    // Emit player movement to the server
     if (moved) {
       this.socket.emit('playerMove', {
         x: this.player.x,
         y: this.player.y,
+        direction: direction // Send the direction as well
       });
     }
+  
+    // Update other players' positions and animations
+    Object.keys(this.players).forEach(playerId => {
+      const otherPlayer = this.players[playerId];
+      if (otherPlayer) {
+        // Update the animation for the other player based on direction
+        if (otherPlayer.direction === 'left') {
+          otherPlayer.anims.play('walk-left', true);
+        } else if (otherPlayer.direction === 'right') {
+          otherPlayer.anims.play('walk-right', true);
+        } else if (otherPlayer.direction === 'up') {
+          otherPlayer.anims.play('walk-up', true);
+        } else if (otherPlayer.direction === 'down') {
+          otherPlayer.anims.play('walk-down', true);
+        } else {
+          otherPlayer.anims.stop(); // Idle animation
+        }
+      }
+    });
   }
+  
 
   addPlayer(playerInfo) {
     this.player = this.physics.add.sprite(playerInfo.x, playerInfo.y, 'character');
@@ -365,15 +398,25 @@ class GameScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
   }
 
-  addOtherPlayer(playerInfo) {
-    if (!this.add) {
-      console.error("Scene is not ready to add a sprite");
-      return;
-    }
-    const otherPlayer = this.add.sprite(playerInfo.x, playerInfo.y, 'character');
-    otherPlayer.playerId = playerInfo.playerId;
-    this.players[playerInfo.playerId] = otherPlayer;
+  // Add other player to the scene
+addOtherPlayer(playerInfo) {
+  const otherPlayer = this.add.sprite(playerInfo.x, playerInfo.y, 'character');
+  otherPlayer.playerId = playerInfo.playerId;
+  otherPlayer.direction = playerInfo.direction; // Store the initial direction
+  this.players[playerInfo.playerId] = otherPlayer;
+
+  // Set initial animation (based on initial direction)
+  if (otherPlayer.direction === 'left') {
+    otherPlayer.anims.play('walk-left', true);
+  } else if (otherPlayer.direction === 'right') {
+    otherPlayer.anims.play('walk-right', true);
+  } else if (otherPlayer.direction === 'up') {
+    otherPlayer.anims.play('walk-up', true);
+  } else {
+    otherPlayer.anims.play('walk-down', true);
   }
+}
+
 }
 
 export default GameScene;

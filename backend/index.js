@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
   console.log(`Player connected: ${socket.id}`);
   
   // Initialize a new player
-  players[socket.id] = { x: 400, y: 300 }; // Start position
+  players[socket.id] = { x: 400, y: 300 , direction: 'down'}; // Start position
   
   // Notify other players of the new player
   socket.broadcast.emit('newPlayer', { id: socket.id, ...players[socket.id] });
@@ -45,10 +45,10 @@ socket.on('playerMove', (data) => {
 
       // Broadcast the movement and direction to all other players
       socket.broadcast.emit('playerMoved', {
-          id: socket.id,
+        id: socket.id,
           x: data.x,
           y: data.y,
-          // direction: data.direction
+          direction: data.direction
       });
   }
 });
