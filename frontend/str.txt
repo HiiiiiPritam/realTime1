@@ -1,0 +1,5 @@
+/src
+  /components
+    GameCanvas.js      // React component to hold the Phaser game
+  /phaser
+    GameScene.js       // Phaser scene for handling the game world
